@@ -19,8 +19,8 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.udacity.firebase.shoppinglistplusplus.R;
+import com.udacity.firebase.shoppinglistplusplus.map.MapActivity;
 import com.udacity.firebase.shoppinglistplusplus.model.User;
-import com.udacity.firebase.shoppinglistplusplus.ui.activeLists.AddListDialogFragment;
 import com.udacity.firebase.shoppinglistplusplus.ui.activeLists.ShoppingListsFragment;
 import com.udacity.firebase.shoppinglistplusplus.ui.meals.AddMealDialogFragment;
 import com.udacity.firebase.shoppinglistplusplus.ui.meals.MealsFragment;
@@ -142,8 +142,10 @@ public class MainActivity extends BaseActivity {
      */
     public void showAddListDialog(View view) {
         /* Create an instance of the dialog fragment and show it */
-        DialogFragment dialog = AddListDialogFragment.newInstance(mEncodedEmail);
-        dialog.show(MainActivity.this.getFragmentManager(), "AddListDialogFragment");
+//        DialogFragment dialog = AddListDialogFragment.newInstance(mEncodedEmail);
+//        dialog.show(MainActivity.this.getFragmentManager(), "AddListDialogFragment");
+        Intent intent = new Intent(MainActivity.this, MapActivity.class);
+        startActivity(intent);
     }
 
     /**

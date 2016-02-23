@@ -29,7 +29,7 @@
             android:layout_height="@dimen/logo_image_size"
             android:layout_marginBottom="@dimen/lists_title_bottom_margin"
             android:contentDescription="@string/image_view_logo_image"
-            android:src="@drawable/ic_shopping_list" />
+            android:src="@drawable/icon3" />
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/til_email"

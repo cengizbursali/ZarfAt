@@ -5,13 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey"
-    tools:context=".MealsFragment">
-
-    <!--<ListView-->
-    <!--android:id="@+id/list_view_meals_list"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:scrollbars="none" />-->
+    tools:context="com.udacity.firebase.shoppinglistplusplus.map.MapActivityFragment">
 
     <fragment
         android:id="@+id/map"
@@ -36,12 +30,7 @@
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/user_location" />
-        <!--<fragment-->
-        <!--android:id="@+id/place_autocomplete_fragment"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"-->
-        <!--/>-->
+
         <ImageView
             android:id="@+id/place_autocomplete_imageview"
             android:layout_width="30dp"
@@ -75,19 +64,5 @@
             android:onClick="onAddFriendPressed"
             android:src="@drawable/write_message" />
     </LinearLayout>
-
-    <!--<android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--android:id="@+id/fab"-->
-    <!--style="@style/FAB"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:onClick="showAddMealDialog"-->
-    <!--android:src="@drawable/icon_add"-->
-    <!--app:borderWidth="0dp"-->
-    <!--app:elevation="6dp"-->
-    <!--app:pressedTranslationZ="12dp" />-->
 
 </RelativeLayout>

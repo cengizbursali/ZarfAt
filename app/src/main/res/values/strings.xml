@@ -211,4 +211,6 @@
     <string name="sort_by_list_name_value">listName</string>
     <string name="sort_by_owner_value">owner</string>
     <string name="sort_by_most_recently_changed_value">timestampLastChangedReverse/timestamp</string>
+    <string name="write_message">Write Your Message!</string>
+    <string name="title_activity_map">MapActivity</string>
 </resources>

@@ -2,25 +2,40 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.udacity.firebase.shoppinglistplusplus">
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
-        android:name="com.udacity.firebase.shoppinglistplusplus.ShoppingListApplication"
+        android:name=".ShoppingListApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_shopping_list"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBnRSkkRRZ2mlDGsoTo0PnhleCb9_KYmeA" />
+
         <activity
-            android:name="com.udacity.firebase.shoppinglistplusplus.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.udacity.firebase.shoppinglistplusplus.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.activeListDetails.ActiveListDetailsActivity"
             android:label="@string/title_activity_list_details"
@@ -30,14 +45,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
-
         <activity android:name=".ui.login.LoginActivity">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.login.CreateAccountActivity"
             android:label="@string/title_activity_create_account"
@@ -66,5 +80,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.sharing.ShareListActivity" />
         </activity>
+        <activity
+            android:name=".map.MapActivity"
+            android:label="@string/title_activity_map"
+            android:theme="@style/AppTheme"></activity>
     </application>
+
 </manifest>

@@ -1,5 +1,4 @@
-package com.udacity.firebase.shoppinglistplusplus.ui.meals;
-
+package com.udacity.firebase.shoppinglistplusplus.map;
 
 import android.Manifest;
 import android.app.DialogFragment;
@@ -36,6 +35,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.udacity.firebase.shoppinglistplusplus.R;
+import com.udacity.firebase.shoppinglistplusplus.ui.meals.AddMealDialogFragment;
+import com.udacity.firebase.shoppinglistplusplus.ui.meals.MealsFragment;
 
 
 /**
@@ -43,7 +44,7 @@ import com.udacity.firebase.shoppinglistplusplus.R;
  * Use the {@link MealsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MealsFragment extends Fragment
+public class MapActivityFragment extends Fragment
         implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private final int RESULT_OK = -1;
@@ -64,14 +65,14 @@ public class MealsFragment extends Fragment
     /**
      * Create fragment and pass bundle with data as its' arguments
      */
-    public static MealsFragment newInstance() {
-        MealsFragment fragment = new MealsFragment();
+    public static MapActivityFragment newInstance() {
+        MapActivityFragment fragment = new MapActivityFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public MealsFragment() {
+    public MapActivityFragment() {
         /* Required empty public constructor*/
     }
 
