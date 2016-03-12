@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/write_message_layout"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="2"
+    android:background="@color/primary"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <ImageButton
+        android:id="@+id/btn_add_friend"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/lists_row_height"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
+        android:onClick="onAddFriendPressed"
+        android:src="@drawable/icon_add_friend2" />
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/text_add_friend" />
+
+    <EditText
+        android:id="@+id/message_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center_horizontal"
+        android:hint="@string/hint_enter_message" />
+
+    <Button
+        android:id="@+id/create_message_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="@string/button_create_message" />
+
+</LinearLayout>

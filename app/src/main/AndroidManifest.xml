@@ -11,9 +11,11 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name=".ShoppingListApplication"
@@ -63,27 +65,34 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/action_settings" />
-        <activity
-            android:name=".ui.sharing.ShareListActivity"
-            android:label="@string/title_activity_share_list"
-            android:parentActivityName=".ui.activeListDetails.ActiveListDetailsActivity"
-            android:windowSoftInputMode="adjustPan">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activeListDetails.ActiveListDetailsActivity" />
-        </activity>
+
         <activity
             android:name=".ui.sharing.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
-            android:parentActivityName=".ui.sharing.ShareListActivity">
+            android:parentActivityName=".ui.sharing.FriendsList">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.sharing.ShareListActivity" />
+                android:value=".ui.sharing.FriendsList" />
         </activity>
+
+        <!--<service android:name=".geofence.GeofenceTransitionsIntentService" />-->
+
         <activity
-            android:name=".map.MapActivity"
-            android:label="@string/title_activity_map"
-            android:theme="@style/AppTheme"></activity>
+            android:name=".ui.sharing.FriendsList"
+            android:label="@string/title_activity_friends_list"
+            android:theme="@style/AppTheme"
+            />
+
+        <activity android:name=".map.MapMainActivity"
+            android:launchMode="singleTop"></activity>
+
+        <receiver android:name=".geofence.GeofenceReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name=".geofence.ACTION_RECEIVE_GEOFENCE"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

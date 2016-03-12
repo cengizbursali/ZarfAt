@@ -56,7 +56,7 @@ public class AddFriendActivity extends BaseActivity {
         @Override
         public void afterTextChanged(Editable s) {
                 /* Get the input after every textChanged event and transform it to lowercase */
-            mInput = mEditTextAddFriendEmail.getText().toString().toLowerCase();
+            mInput = mEditTextAddFriendEmail.getText().toString();
 
             /* Clean up the old adapter */
             if (mFriendsAutocompleteAdapter != null) mFriendsAutocompleteAdapter.cleanup();
@@ -67,7 +67,7 @@ public class AddFriendActivity extends BaseActivity {
             /* Define and set the adapter otherwise. */
             } else {
                 mFriendsAutocompleteAdapter = new AutocompleteFriendAdapter(AddFriendActivity.this, User.class,
-                        R.layout.single_autocomplete_item, mUsersRef.orderByChild(Constants.FIREBASE_PROPERTY_EMAIL)
+                        R.layout.single_autocomplete_item, mUsersRef.orderByChild(Constants.FIREBASE_PROPERTY_NAME)
                         .startAt(mInput).endAt(mInput + "~").limitToFirst(5), mEncodedEmail);
 
                 mListViewAutocomplete.setAdapter(mFriendsAutocompleteAdapter);

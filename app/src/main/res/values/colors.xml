@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="grey">#EDEEEF</color>
-    <color name="dark_green">#1775e2</color>
+    <color name="dark_green">#212121</color>
 
     <color name="dark_grey">#AEAEAE</color>
 
@@ -16,7 +16,7 @@
     <color name="google">#C6412C</color>
 
     <!--<color name="dark_green">#3C388E</color>-->
-    <color name="primary">#1C83CF</color>
+    <color name="primary">#424242</color>
     <color name="primary_dark">#315AB8</color>
     <color name="primary_light">#C8DCED</color>
 </resources>

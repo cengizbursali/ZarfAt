@@ -56,7 +56,7 @@ public class AutocompleteFriendAdapter extends FirebaseListAdapter<User> {
                 /**
                  * If selected user is not current user proceed
                  */
-                if (isNotCurrentUser(user)) {
+//                if (isNotCurrentUser(user)) {
 
                     Firebase currentUserFriendsRef = new Firebase(Constants.FIREBASE_URL_USER_FRIENDS).child(mEncodedEmail);
                     final Firebase friendRef = currentUserFriendsRef.child(user.getEmail());
@@ -85,7 +85,7 @@ public class AutocompleteFriendAdapter extends FirebaseListAdapter<User> {
                         }
                     });
 
-                }
+//                }
             }
         });
 
