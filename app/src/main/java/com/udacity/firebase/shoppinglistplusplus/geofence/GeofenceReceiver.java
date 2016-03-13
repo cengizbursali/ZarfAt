@@ -55,8 +55,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
         String userEncodedMail = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString(Constants.KEY_ENCODED_EMAIL, null);
         // Test that the reported transition was of interest.
-        if (/*userEncodedMail.equals(receiverEncodedEmail) && */(geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT)) {
+        if (userEncodedMail.equals(receiverEncodedEmail) && geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
@@ -119,8 +118,6 @@ public class GeofenceReceiver extends BroadcastReceiver {
         stackBuilder.addNextIntent(notificationIntent);
 
         // Get a PendingIntent containing the entire back stack.
-//        PendingIntent notificationPendingIntent =
-//                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         PendingIntent notificationPendingIntent =
                 PendingIntent.getActivity(getContext(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

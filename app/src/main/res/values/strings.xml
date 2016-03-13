@@ -246,7 +246,9 @@
 
     <string name="title_message_received">You already read this message</string>
     <string name="toast_message_created">Your message has been created</string>
+    <string name="toast_message_context_empty">Your message cannot be empty!</string>
     <string name="text_female">Female</string>
     <string name="text_male">Male</string>
+    <string name="title_leave_message">Click to leave a message here!</string>
 
 </resources>

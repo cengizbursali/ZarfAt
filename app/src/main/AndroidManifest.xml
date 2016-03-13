@@ -14,8 +14,7 @@
     <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".ShoppingListApplication"
@@ -65,7 +64,6 @@
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/action_settings" />
-
         <activity
             android:name=".ui.sharing.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
@@ -75,24 +73,26 @@
                 android:value=".ui.sharing.FriendsList" />
         </activity>
 
-        <!--<service android:name=".geofence.GeofenceTransitionsIntentService" />-->
+        <!-- <service android:name=".geofence.GeofenceTransitionsIntentService" /> -->
 
         <activity
             android:name=".ui.sharing.FriendsList"
             android:label="@string/title_activity_friends_list"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".map.MapMainActivity"
+            android:launchMode="singleTop" />
 
-        <activity android:name=".map.MapMainActivity"
-            android:launchMode="singleTop"></activity>
-
-        <receiver android:name=".geofence.GeofenceReceiver"
+        <receiver
+            android:name=".geofence.GeofenceReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name=".geofence.ACTION_RECEIVE_GEOFENCE"/>
+                <action android:name=".geofence.ACTION_RECEIVE_GEOFENCE" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".ui.UserProfileActivity"></activity>
     </application>
 
 </manifest>

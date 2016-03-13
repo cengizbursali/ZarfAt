@@ -11,7 +11,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -25,16 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -60,27 +54,22 @@ import com.udacity.firebase.shoppinglistplusplus.geofence.GeofenceReceiver;
 import com.udacity.firebase.shoppinglistplusplus.model.Message;
 import com.udacity.firebase.shoppinglistplusplus.ui.sharing.FriendsList;
 import com.udacity.firebase.shoppinglistplusplus.utils.Constants;
+import com.udacity.firebase.shoppinglistplusplus.utils.MapUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapMainActivity extends AppCompatActivity
-        implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
+public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallback, ResultCallback<Status> {
 
     private static final String TAG = MapMainActivity.class.getSimpleName();
 
-    protected GoogleApiClient mGoogleApiClient;
     protected Location mLastLocation;
-    boolean mapReady = false;
-    private GoogleMap m_map;
     private Marker currentMarker;
     private Circle currentCircle;
     private ArrayList<Geofence> mGeofenceList;
     private String receiverEncodedEmail;
     private String senderEncodedMail;
-    private String messageId;
 
     private LinearLayout writeMessageLayout;
     private ImageView userLocImageView;
@@ -90,14 +79,17 @@ public class MapMainActivity extends AppCompatActivity
     private TextView addFriendTextView;
     private LinearLayout showMessageLayout;
 
+    private Map<Marker, String> messageMap;
+
     @Override
     protected void onNewIntent(Intent intent) {
         Bundle bundle = intent.getExtras();
         if (bundle != null && bundle.containsKey(Constants.KEY_MESSAGE_ID)) {
-            Log.i(TAG, "message id: " + bundle.getString(Constants.KEY_MESSAGE_ID));
+            final String messageId = bundle.getString(Constants.KEY_MESSAGE_ID);
+            Log.i(TAG, "message id: " + messageId);
             Firebase messageRef = new Firebase(Constants.FIREBASE_URL_RECEIVED_MESSAGES)
                     .child(senderEncodedMail)
-                    .child(bundle.getString(Constants.KEY_MESSAGE_ID));
+                    .child(messageId);
             messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -107,11 +99,6 @@ public class MapMainActivity extends AppCompatActivity
                                 .get(Constants.FIREBASE_PROPERTY_LATITUDE).toString()),
                                 Double.parseDouble(message.getLocation()
                                         .get(Constants.FIREBASE_PROPERTY_LONGITUDE).toString()));
-                        m_map.addMarker(new MarkerOptions()
-                                .position(latLng)
-                                .title(getString(R.string.title_message_received))
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.received_message)))
-                                .showInfoWindow();
                         flyTo(latLng, Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_SLOW);
                         ((TextView) showMessageLayout.findViewById(R.id.tv_message_context))
                                 .setText(message.getContext());
@@ -141,8 +128,9 @@ public class MapMainActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // Empty list for storing geofences.
         mGeofenceList = new ArrayList<>();
+
+        messageMap = new HashMap<>();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -152,6 +140,91 @@ public class MapMainActivity extends AppCompatActivity
 
         initializeScreen();
         onNewIntent(getIntent());
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        mapReady = true;
+        m_map = map;
+
+        m_map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.i(TAG, "map click");
+                if (writeMessageLayout.getVisibility() == View.VISIBLE) {
+                    hideWriteMessageLayout(writeMessageLayout);
+                    addFriendTextView.setText(R.string.text_add_friend);
+                    if (currentCircle != null) {
+                        currentCircle.remove();
+                    }
+                    if (currentMarker != null) {
+                        currentMarker.remove();
+                    }
+                } else if (showMessageLayout.getVisibility() == View.VISIBLE) {
+                    hideWriteMessageLayout(showMessageLayout);
+                } else {
+                    createCircledMarker(latLng);
+                }
+            }
+        });
+
+        m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Log.i(TAG, "marker click");
+                marker.showInfoWindow();
+                return false;
+            }
+        });
+
+        m_map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                if (marker.getTitle().equals(getString(R.string.title_message_received))) {
+                    currentMarker = marker;
+                    Firebase messageRef = new Firebase(Constants.FIREBASE_URL_RECEIVED_MESSAGES)
+                            .child(senderEncodedMail)
+                            .child(messageMap.get(marker));
+                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Message message = dataSnapshot.getValue(Message.class);
+                            if (message != null) {
+                                LatLng latLng = new LatLng(Double.parseDouble(message.getLocation()
+                                        .get(Constants.FIREBASE_PROPERTY_LATITUDE).toString()),
+                                        Double.parseDouble(message.getLocation()
+                                                .get(Constants.FIREBASE_PROPERTY_LONGITUDE).toString()));
+                                flyTo(latLng, Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_SLOW);
+                                ((TextView) showMessageLayout.findViewById(R.id.tv_message_context))
+                                        .setText(message.getContext());
+                                ((TextView) showMessageLayout.findViewById(R.id.tv_sender))
+                                        .setText(message.getCreator());
+                                showWriteMessageLayout(showMessageLayout);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+                            Log.e(TAG, getString(R.string.log_error_the_read_failed) +
+                                    firebaseError.getMessage());
+                        }
+                    });
+                } else if (writeMessageLayout.getVisibility() != View.VISIBLE) {
+                    flyTo(new LatLng(marker.getPosition().latitude - 0.0005, marker.getPosition().longitude),
+                            Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_FAST);
+                    showWriteMessageLayout(writeMessageLayout);
+                    currentCircle = m_map.addCircle(new CircleOptions()
+                            .center(marker.getPosition())
+                            .radius(Constants.GEOFENCE_RADIUS_IN_METERS)
+                            .strokeColor(Color.GREEN)
+                            .fillColor(Color.argb(64, 0, 255, 0)));
+                }
+            }
+        });
+
+        LatLng newYork = new LatLng(32.3119443, 35.0178292);
+        CameraPosition target = CameraPosition.builder().target(newYork).zoom(Constants.MAP_ZOOM_LEVEL_FAR).build();
+        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(target));
     }
 
     private void initializeScreen() {
@@ -168,7 +241,6 @@ public class MapMainActivity extends AppCompatActivity
 
         placeAutocompleteImageView = (ImageView) findViewById(R.id.place_autocomplete_imageview);
 
-
         showMessages(Constants.FIREBASE_URL_SENT_MESSAGES, R.drawable.sent_message);
         showMessages(Constants.FIREBASE_URL_RECEIVED_MESSAGES, R.drawable.received_message);
 
@@ -176,11 +248,24 @@ public class MapMainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 populateGeofenceList();
-                createMessage();
-                addGeofence();
-                hideWriteMessageLayout();
-                currentCircle.remove();
-                currentMarker.hideInfoWindow();
+                String messageContext = messageEditText.getText().toString();
+                String messageId;
+                if (!messageContext.equals("")) {
+                    messageId = MapUtils.createMessage(messageContext, senderEncodedMail, receiverEncodedEmail,
+                            currentMarker.getPosition());
+                    addGeofence(messageId);
+                    hideWriteMessageLayout(writeMessageLayout);
+                    addFriendTextView.setText(R.string.text_add_friend);
+                    currentCircle.remove();
+                    currentMarker.hideInfoWindow();
+                    currentMarker = null;
+                } else {
+                    Toast.makeText(
+                            MapMainActivity.this,
+                            getString(R.string.toast_message_context_empty),
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
             }
         });
 
@@ -220,7 +305,7 @@ public class MapMainActivity extends AppCompatActivity
         });
     }
 
-    private void showMessages(String url, final int iconRecourse) {
+    private void showMessages(final String url, final int iconRecourse) {
         Firebase messagesRef = new Firebase(url).child(senderEncodedMail);
         Query messages = messagesRef.orderByKey();
         messages.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -234,10 +319,13 @@ public class MapMainActivity extends AppCompatActivity
                             .get(Constants.FIREBASE_PROPERTY_LATITUDE).toString()),
                             Double.parseDouble(message.getLocation()
                                     .get(Constants.FIREBASE_PROPERTY_LONGITUDE).toString()));
-                    m_map.addMarker(new MarkerOptions()
+                    Marker marker = m_map.addMarker(new MarkerOptions()
                             .position(latLng)
                             .title(getString(R.string.title_message_received))
                             .icon(BitmapDescriptorFactory.fromResource(iconRecourse)));
+                    if (url.equals(Constants.FIREBASE_URL_RECEIVED_MESSAGES)) {
+                        messageMap.put(marker, snapshot.getKey());
+                    }
                 }
             }
 
@@ -259,14 +347,16 @@ public class MapMainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         if (writeMessageLayout.getVisibility() == View.VISIBLE) {
-            hideWriteMessageLayout();
+            hideWriteMessageLayout(writeMessageLayout);
+            addFriendTextView.setText(R.string.text_add_friend);
             if (currentCircle != null) {
                 currentCircle.remove();
             }
             if (currentMarker != null) {
                 currentMarker.remove();
             }
-            currentCircle.remove();
+        } else if (showMessageLayout.getVisibility() == View.VISIBLE) {
+            hideWriteMessageLayout(showMessageLayout);
         } else {
             super.onBackPressed();
         }
@@ -305,42 +395,12 @@ public class MapMainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mapReady = true;
-        m_map = map;
-
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                if (writeMessageLayout.getVisibility() == View.VISIBLE) {
-                    hideWriteMessageLayout();
-                    if (currentCircle != null) {
-                        currentCircle.remove();
-                    }
-                    if (currentMarker != null) {
-                        currentMarker.remove();
-                    }
-
-                } else {
-                    createCircledMarker(latLng);
-                }
-            }
-        });
-
-        LatLng newYork = new LatLng(32.3119443, 35.0178292);
-        CameraPosition target = CameraPosition.builder().target(newYork).zoom(Constants.MAP_ZOOM_LEVEL_FAR).build();
-        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(target));
-
-    }
-
-    protected void hideWriteMessageLayout() {
+    protected void hideWriteMessageLayout(LinearLayout layout) {
         Animation bottomDown = AnimationUtils.loadAnimation(this,
                 R.anim.bottom_down);
-        writeMessageLayout.startAnimation(bottomDown);
-        writeMessageLayout.setVisibility(View.GONE);
-        flyTo(currentMarker.getPosition(), Constants.MAP_ZOOM_LEVEL_FAR, Constants.MAP_FLY_TIME_SEC_FAST);
-        addFriendTextView.setText(R.string.text_add_friend);
+        layout.startAnimation(bottomDown);
+        layout.setVisibility(View.GONE);
+        flyTo(m_map.getCameraPosition().target, Constants.MAP_ZOOM_LEVEL_FAR, Constants.MAP_FLY_TIME_SEC_FAST);
         m_map.getUiSettings().setScrollGesturesEnabled(true);
         m_map.getUiSettings().setZoomGesturesEnabled(true);
     }
@@ -367,41 +427,12 @@ public class MapMainActivity extends AppCompatActivity
         }
         currentMarker = m_map.addMarker(new MarkerOptions()
                 .position(latLng)
-                .title("Leave a message here!")
+                .title(getString(R.string.title_leave_message))
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.sent_message)));
         currentMarker.showInfoWindow();
-        m_map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-
-                if (writeMessageLayout.getVisibility() != View.VISIBLE) {
-                    flyTo(new LatLng(latLng.latitude - 0.0005, latLng.longitude),
-                            Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_FAST);
-                    showWriteMessageLayout(writeMessageLayout);
-                    currentCircle = m_map.addCircle(new CircleOptions()
-                            .center(latLng)
-                            .radius(Constants.GEOFENCE_RADIUS_IN_METERS)
-                            .strokeColor(Color.GREEN)
-                            .fillColor(Color.argb(64, 0, 255, 0)));
-                }
-            }
-        });
     }
 
-    private void createPlaceFinder() {
-        try {
-            Intent intent =
-                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                            .build(this);
-            startActivityForResult(intent, Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException e) {
-            Log.e(TAG, "Could not create place finder " + e.getMessage());
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Log.e(TAG, "Could not create place finder " + e.getMessage());
-        }
-    }
-
-    public void addGeofence() {
+    public void addGeofence(String messageId) {
         if (!mGoogleApiClient.isConnected()) {
             Toast.makeText(this, getString(R.string.not_connected), Toast.LENGTH_SHORT).show();
             return;
@@ -415,7 +446,7 @@ public class MapMainActivity extends AppCompatActivity
                     // A pending intent that that is reused when calling removeGeofences(). This
                     // pending intent is used to generate an intent when a matched geofence
                     // transition is observed.
-                    getGeofencePendingIntent()
+                    getGeofencePendingIntent(messageId)
             ).setResultCallback(this); // Result processed in onResult().
         } catch (SecurityException securityException) {
             // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
@@ -451,7 +482,7 @@ public class MapMainActivity extends AppCompatActivity
 
     }
 
-    private PendingIntent getGeofencePendingIntent() {
+    private PendingIntent getGeofencePendingIntent(String messageId) {
         Intent intent = new Intent(this, GeofenceReceiver.class);
         intent.putExtra(Constants.KEY_ENCODED_EMAIL, receiverEncodedEmail);
         intent.putExtra(Constants.KEY_MESSAGE_ID, messageId);
@@ -469,7 +500,7 @@ public class MapMainActivity extends AppCompatActivity
     public void onResult(Status status) {
         if (status.isSuccess()) {
             Toast.makeText(
-                    this,
+                    MapMainActivity.this,
                     getString(R.string.toast_message_created),
                     Toast.LENGTH_LONG
             ).show();
@@ -481,90 +512,4 @@ public class MapMainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    /**
-     * Runs when a GoogleApiClient object successfully connects.
-     */
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        // Provides a simple way of getting a device's location and is well suited for
-        // applications that do not require a fine-grained location and that do not need location
-        // updates. Gets the best and most recent location currently available, which may be null
-        // in rare cases when a location is not available.
-        Log.i(TAG, "GoogleApiClient connected");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
-        // onConnectionFailed.
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
-        Log.i(TAG, "Connection suspended");
-        mGoogleApiClient.connect();
-    }
-
-    public void createMessage() {
-        String messageContext = messageEditText.getText().toString();
-
-        if (!messageContext.equals("")) {
-
-            Firebase messagesRef = new Firebase(Constants.FIREBASE_URL_SENT_MESSAGES).
-                    child(senderEncodedMail);
-            final Firebase firebaseRef = new Firebase(Constants.FIREBASE_URL);
-
-            Firebase newMessageRef = messagesRef.push();
-
-            messageId = newMessageRef.getKey();
-
-            HashMap<String, Object> newMessageMapping = new HashMap<>();
-
-            HashMap<String, Object> timestampCreated = new HashMap<>();
-            timestampCreated.put(Constants.FIREBASE_PROPERTY_TIMESTAMP, ServerValue.TIMESTAMP);
-
-            HashMap<String, Object> location = new HashMap<>();
-            location.put(Constants.FIREBASE_PROPERTY_LATITUDE, currentMarker.getPosition().latitude);
-            location.put(Constants.FIREBASE_PROPERTY_LONGITUDE, currentMarker.getPosition().longitude);
-
-            Message message = new Message(messageContext, location, timestampCreated, senderEncodedMail);
-
-            HashMap<String, Object> sentMessageMap = (HashMap<String, Object>)
-                    new ObjectMapper().convertValue(message, Map.class);
-            HashMap<String, Object> receivedMessageMap = (HashMap<String, Object>)
-                    new ObjectMapper().convertValue(message, Map.class);
-
-            newMessageMapping.put("/" + Constants.FIREBASE_LOCATION_SENT_MESSAGES + "/" + senderEncodedMail + "/"
-                    + messageId, sentMessageMap);
-            newMessageMapping.put("/" + Constants.FIREBASE_LOCATION_RECEIVED_MESSAGES + "/" + receiverEncodedEmail + "/"
-                    + messageId, receivedMessageMap);
-
-            firebaseRef.updateChildren(newMessageMapping, new Firebase.CompletionListener() {
-                @Override
-                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-
-                    Log.i(TAG, "message added");
-                }
-            });
-        }
-    }
 }
