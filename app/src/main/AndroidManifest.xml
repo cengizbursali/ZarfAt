@@ -92,7 +92,17 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.UserProfileActivity"></activity>
+        <activity android:name=".ui.UserProfileActivity" />
+        <activity android:name=".ui.ElifActivity" />
+        <activity android:name=".ui.NavigatorActivity" />
+
+        <!-- <activity android:name=".ui.CengizMainActivity" /> -->
+        <activity android:name="com.facebook.FacebookActivity" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
     </application>
 
 </manifest>

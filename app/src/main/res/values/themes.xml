@@ -7,10 +7,10 @@
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/dark_green</item>
+        <item name="colorAccent">@color/primary_dark</item>
         <item name="android:colorBackground">@color/primary</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">#fcfcfc</item>
+        <!--<item name="android:textColorPrimary">@android:color/white</item>-->
+        <!--<item name="android:textColorSecondary">#fcfcfc</item>-->
     </style>
 
 

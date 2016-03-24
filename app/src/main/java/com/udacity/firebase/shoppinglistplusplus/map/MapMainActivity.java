@@ -11,15 +11,16 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +65,8 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
 
     private static final String TAG = MapMainActivity.class.getSimpleName();
 
-    protected Location mLastLocation;
+    private SupportMapFragment mapFragment;
+    private Location mLastLocation;
     private Marker currentMarker;
     private Circle currentCircle;
     private ArrayList<Geofence> mGeofenceList;
@@ -72,8 +74,6 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
     private String senderEncodedMail;
 
     private LinearLayout writeMessageLayout;
-    private ImageView userLocImageView;
-    private ImageView placeAutocompleteImageView;
     private Button createMessageButton;
     private EditText messageEditText;
     private TextView addFriendTextView;
@@ -120,12 +120,11 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_map);
 
         senderEncodedMail = PreferenceManager.getDefaultSharedPreferences(MapMainActivity.this)
                 .getString(Constants.KEY_ENCODED_EMAIL, null);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         mGeofenceList = new ArrayList<>();
@@ -140,6 +139,37 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
 
         initializeScreen();
         onNewIntent(getIntent());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_search_place) {
+            createPlaceFinder();
+        } else if (id == R.id.action_user_location) {
+            if (ActivityCompat.checkSelfPermission(MapMainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MapMainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        Constants.REQUEST_CODE_LOCATION);
+                return false;
+            }
+            if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE))
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Intent gpsOptionsIntent = new Intent(
+                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(gpsOptionsIntent);
+            } else {
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                if (mLastLocation != null) {
+                    LatLng userCurrentLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    createCircledMarker(userCurrentLoc);
+                    flyTo(userCurrentLoc, Constants.MAP_ZOOM_LEVEL_FAR, Constants.MAP_FLY_TIME_SEC_SLOW);
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -171,9 +201,11 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
         m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Log.i(TAG, "marker click");
-                marker.showInfoWindow();
-                return false;
+                if (writeMessageLayout.getVisibility() == View.GONE
+                        && showMessageLayout.getVisibility() == View.GONE) {
+                    marker.showInfoWindow();
+                }
+                return true;
             }
         });
 
@@ -181,42 +213,18 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
             @Override
             public void onInfoWindowClick(Marker marker) {
                 if (marker.getTitle().equals(getString(R.string.title_message_received))) {
-                    currentMarker = marker;
-                    Firebase messageRef = new Firebase(Constants.FIREBASE_URL_RECEIVED_MESSAGES)
-                            .child(senderEncodedMail)
-                            .child(messageMap.get(marker));
-                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Message message = dataSnapshot.getValue(Message.class);
-                            if (message != null) {
-                                LatLng latLng = new LatLng(Double.parseDouble(message.getLocation()
-                                        .get(Constants.FIREBASE_PROPERTY_LATITUDE).toString()),
-                                        Double.parseDouble(message.getLocation()
-                                                .get(Constants.FIREBASE_PROPERTY_LONGITUDE).toString()));
-                                flyTo(latLng, Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_SLOW);
-                                ((TextView) showMessageLayout.findViewById(R.id.tv_message_context))
-                                        .setText(message.getContext());
-                                ((TextView) showMessageLayout.findViewById(R.id.tv_sender))
-                                        .setText(message.getCreator());
-                                showWriteMessageLayout(showMessageLayout);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
-                            Log.e(TAG, getString(R.string.log_error_the_read_failed) +
-                                    firebaseError.getMessage());
-                        }
-                    });
-                } else if (writeMessageLayout.getVisibility() != View.VISIBLE) {
+                    showMessage(Constants.FIREBASE_URL_RECEIVED_MESSAGES, marker);
+                } else if (marker.getTitle().equals(getString(R.string.title_message_left))) {
+                    showMessage(Constants.FIREBASE_URL_SENT_MESSAGES, marker);
+                } else if (marker.getTitle().equals(getString(R.string.title_leave_message))
+                        && writeMessageLayout.getVisibility() != View.VISIBLE) {
                     flyTo(new LatLng(marker.getPosition().latitude - 0.0005, marker.getPosition().longitude),
                             Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_FAST);
                     showWriteMessageLayout(writeMessageLayout);
                     currentCircle = m_map.addCircle(new CircleOptions()
                             .center(marker.getPosition())
                             .radius(Constants.GEOFENCE_RADIUS_IN_METERS)
-                            .strokeColor(Color.GREEN)
+                            .strokeColor(ContextCompat.getColor(getBaseContext(), R.color.accent))
                             .fillColor(Color.argb(64, 0, 255, 0)));
                 }
             }
@@ -227,10 +235,39 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(target));
     }
 
+    private void showMessage(String url, Marker marker) {
+        Firebase messageRef = new Firebase(url)
+                .child(senderEncodedMail)
+                .child(messageMap.get(marker));
+        messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Message message = dataSnapshot.getValue(Message.class);
+                if (message != null) {
+                    LatLng latLng = new LatLng(Double.parseDouble(message.getLocation()
+                            .get(Constants.FIREBASE_PROPERTY_LATITUDE).toString()),
+                            Double.parseDouble(message.getLocation()
+                                    .get(Constants.FIREBASE_PROPERTY_LONGITUDE).toString()));
+                    flyTo(latLng, Constants.MAP_ZOOM_LEVEL_CLOSE, Constants.MAP_FLY_TIME_SEC_SLOW);
+                    ((TextView) showMessageLayout.findViewById(R.id.tv_message_context))
+                            .setText(message.getContext());
+                    ((TextView) showMessageLayout.findViewById(R.id.tv_sender))
+                            .setText(message.getCreator());
+                    showWriteMessageLayout(showMessageLayout);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.e(TAG, getString(R.string.log_error_the_read_failed) +
+                        firebaseError.getMessage());
+            }
+        });
+    }
+
     private void initializeScreen() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-        userLocImageView = (ImageView) findViewById(R.id.user_location_imageview);
 
         writeMessageLayout = (LinearLayout) findViewById(R.id.write_message_layout);
         addFriendTextView = (TextView) writeMessageLayout.findViewById(R.id.tv_add_friend);
@@ -238,8 +275,6 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
         createMessageButton = (Button) findViewById(R.id.create_message_button);
 
         showMessageLayout = (LinearLayout) findViewById(R.id.show_message_layout);
-
-        placeAutocompleteImageView = (ImageView) findViewById(R.id.place_autocomplete_imageview);
 
         showMessages(Constants.FIREBASE_URL_SENT_MESSAGES, R.drawable.sent_message);
         showMessages(Constants.FIREBASE_URL_RECEIVED_MESSAGES, R.drawable.received_message);
@@ -257,6 +292,7 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
                     hideWriteMessageLayout(writeMessageLayout);
                     addFriendTextView.setText(R.string.text_add_friend);
                     currentCircle.remove();
+                    currentMarker.setTitle(getString(R.string.title_message_left));
                     currentMarker.hideInfoWindow();
                     currentMarker = null;
                 } else {
@@ -269,40 +305,6 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
             }
         });
 
-        userLocImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ActivityCompat.checkSelfPermission(MapMainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MapMainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            Constants.REQUEST_CODE_LOCATION);
-                    return;
-                }
-                if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE))
-                        .isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    Intent gpsOptionsIntent = new Intent(
-                            android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(gpsOptionsIntent);
-                } else {
-                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    if (mLastLocation != null) {
-                        LatLng userCurrentLoc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-                        createCircledMarker(userCurrentLoc);
-                        flyTo(userCurrentLoc, Constants.MAP_ZOOM_LEVEL_FAR, Constants.MAP_FLY_TIME_SEC_SLOW);
-                    }
-                }
-
-
-            }
-        });
-
-        placeAutocompleteImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createPlaceFinder();
-            }
-        });
     }
 
     private void showMessages(final String url, final int iconRecourse) {
@@ -362,15 +364,6 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
         }
     }
 
-    /**
-     * Launch AddFriendActivity to find and add user to current user's friends list
-     * when the button AddFriend is pressed
-     */
-    public void onAddFriendPressed(View view) {
-        Intent intent = new Intent(MapMainActivity.this, FriendsList.class);
-        startActivityForResult(intent, Constants.FRIEND_LIST_REQUEST_CODE);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.PLACE_AUTOCOMPLETE_REQUEST_CODE) {
@@ -401,8 +394,7 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
         layout.startAnimation(bottomDown);
         layout.setVisibility(View.GONE);
         flyTo(m_map.getCameraPosition().target, Constants.MAP_ZOOM_LEVEL_FAR, Constants.MAP_FLY_TIME_SEC_FAST);
-        m_map.getUiSettings().setScrollGesturesEnabled(true);
-        m_map.getUiSettings().setZoomGesturesEnabled(true);
+        m_map.getUiSettings().setAllGesturesEnabled(true);
     }
 
     protected void showWriteMessageLayout(LinearLayout layout) {
@@ -410,8 +402,7 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
                 R.anim.bottom_up);
         layout.startAnimation(bottomUp);
         layout.setVisibility(View.VISIBLE);
-        m_map.getUiSettings().setScrollGesturesEnabled(false);
-        m_map.getUiSettings().setZoomGesturesEnabled(false);
+        m_map.getUiSettings().setAllGesturesEnabled(false);
     }
 
     private void flyTo(LatLng latLng, int zoom, int durationSec) {
@@ -510,6 +501,15 @@ public class MapMainActivity extends MapBaseActivity implements OnMapReadyCallba
                     status.getStatusCode());
             Log.e(TAG, errorMessage);
         }
+    }
+
+    /**
+     * Launch AddFriendActivity to find and add user to current user's friends list
+     * when the button AddFriend is pressed
+     */
+    public void onAddFriendPressed(View view) {
+        Intent intent = new Intent(MapMainActivity.this, FriendsList.class);
+        startActivityForResult(intent, Constants.FRIEND_LIST_REQUEST_CODE);
     }
 
 }

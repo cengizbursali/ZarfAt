@@ -1,5 +1,6 @@
 package com.udacity.firebase.shoppinglistplusplus;
 
+import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 
 /**
@@ -12,8 +13,10 @@ public class ShoppingListApplication extends android.app.Application {
         super.onCreate();
         /* Initialize Firebase */
         Firebase.setAndroidContext(this);
+
+        FacebookSdk.sdkInitialize(this);
         /* Enable disk persistence  */
-        Firebase.getDefaultConfig().setPersistenceEnabled(true);
+//        Firebase.getDefaultConfig().setPersistenceEnabled(true);
 //        Firebase.getDefaultConfig().setLogLevel(Logger.Level.DEBUG);
     }
 

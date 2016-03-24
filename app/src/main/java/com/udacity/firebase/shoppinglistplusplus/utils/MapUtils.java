@@ -45,8 +45,8 @@ public class MapUtils {
         HashMap<String, Object> receivedMessageMap = (HashMap<String, Object>)
                 new ObjectMapper().convertValue(message, Map.class);
 
-        newMessageMapping.put("/" + Constants.FIREBASE_LOCATION_SENT_MESSAGES + "/" + senderEncodedMail + "/"
-                + messageId, sentMessageMap);
+//        newMessageMapping.put("/" + Constants.FIREBASE_LOCATION_SENT_MESSAGES + "/" + senderEncodedMail + "/"
+//                + messageId, sentMessageMap);
         newMessageMapping.put("/" + Constants.FIREBASE_LOCATION_RECEIVED_MESSAGES + "/" + receiverEncodedEmail + "/"
                 + messageId, receivedMessageMap);
 

@@ -4,7 +4,7 @@
     == Base Strings For the App ==
 
      -->
-    <string name="app_name">ShoppingList++</string>
+    <string name="app_name">Message Hunter</string>
     <string name="pager_title_shopping_lists">Shopping Lists</string>
     <string name="pager_title_meals">Meals</string>
     <string name="remove_item_option">Remove Item</string>
@@ -237,7 +237,7 @@
     </string>
     <string name="geofence_transition_notification_text">Click notification to return to app</string>
 
-    <string name="facebook_app_id">1694544034159530</string>
+    <string name="facebook_app_id">1577429212517612</string>
     <string name="login_with_facebook">Login With Facebook</string>
 
     <string name="button_create_message">Create Message</string>
@@ -250,5 +250,18 @@
     <string name="text_female">Female</string>
     <string name="text_male">Male</string>
     <string name="title_leave_message">Click to leave a message here!</string>
+    <string name="user_location">user location</string>
+    <string name="search_place">search place</string>
+    <string name="title_message_left">show message</string>
+
+    <string name="navigation_item_1">first item</string>
+    <string name="navigation_item_2">second item</string>
+    <string name="navigation_item_3">third item</string>
+    <string name="nav_sub_header">Sub Header</string>
+    <string name="nav_sub_item_1">Sub Item 1</string>
+    <string name="nav_sub_item_2">Sub Item 2</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

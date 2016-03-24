@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="grey">#EDEEEF</color>
-    <color name="dark_green">#212121</color>
+    <!--<color name="dark_green">#212121</color>-->
 
     <color name="dark_grey">#AEAEAE</color>
 
-    <color name="accent">#DF4A32</color>
+
 
     <!--<color name="primary">#83CF1C</color>-->
     <!--<color name="primary_dark">#5AB831</color>-->
@@ -16,9 +16,11 @@
     <color name="google">#C6412C</color>
 
     <!--<color name="dark_green">#3C388E</color>-->
-    <color name="primary">#424242</color>
-    <color name="primary_dark">#315AB8</color>
-    <color name="primary_light">#C8DCED</color>
+    <color name="primary">#8BC34A</color>
+    <color name="primary_dark">#689F38</color>
+    <color name="accent">#795548</color>
+
+    <color name="primary_light">#607D8B</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>

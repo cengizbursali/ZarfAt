@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import com.facebook.login.LoginManager;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.google.android.gms.auth.api.Auth;
@@ -156,6 +157,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
                                 //nothing
                             }
                         });
+            }else if (mProvider.equals("facebook")) {
+                /* Logout from Facebook */
+                LoginManager.getInstance().logOut();
             }
         }
     }

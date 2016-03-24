@@ -7,6 +7,7 @@
     android:fitsSystemWindows="true"
     tools:context="com.letsnurture.ln_202.coordinatorlayoutpart1.ScrollingActivity">
 
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
