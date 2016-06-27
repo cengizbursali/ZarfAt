@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import com.facebook.login.LoginManager;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.google.android.gms.auth.api.Auth;
@@ -132,7 +133,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             linearLayout.setBackgroundResource(R.drawable.background_loginscreen_land);
         } else {
-            linearLayout.setBackgroundResource(R.drawable.background_loginscreen);
+            linearLayout.setBackgroundResource(R.drawable.untitled1);
         }
     }
 
@@ -156,6 +157,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
                                 //nothing
                             }
                         });
+            }else if (mProvider.equals("facebook")) {
+                /* Logout from Facebook */
+                LoginManager.getInstance().logOut();
             }
         }
     }

@@ -25,7 +25,7 @@ import com.udacity.firebase.shoppinglistplusplus.model.ShoppingList;
 import com.udacity.firebase.shoppinglistplusplus.model.ShoppingListItem;
 import com.udacity.firebase.shoppinglistplusplus.model.User;
 import com.udacity.firebase.shoppinglistplusplus.ui.BaseActivity;
-import com.udacity.firebase.shoppinglistplusplus.ui.sharing.ShareListActivity;
+import com.udacity.firebase.shoppinglistplusplus.ui.sharing.FriendsList;
 import com.udacity.firebase.shoppinglistplusplus.utils.Constants;
 import com.udacity.firebase.shoppinglistplusplus.utils.Utils;
 
@@ -325,7 +325,7 @@ public class ActiveListDetailsActivity extends BaseActivity {
          * Eventually we'll add this
          */
         if (id == R.id.action_share_list) {
-            Intent intent = new Intent(ActiveListDetailsActivity.this, ShareListActivity.class);
+            Intent intent = new Intent(ActiveListDetailsActivity.this, FriendsList.class);
             intent.putExtra(Constants.KEY_LIST_ID, mListId);
             /* Starts an active showing the details for the selected list */
             startActivity(intent);

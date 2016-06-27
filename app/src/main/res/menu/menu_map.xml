@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.udacity.firebase.shoppinglistplusplus.map.MapMainActivity">
+    <item
+        android:id="@+id/action_user_location"
+        android:icon="@drawable/user_location"
+        android:orderInCategory="100"
+        android:title="@string/user_location"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_search_place"
+        android:icon="@drawable/search"
+        android:orderInCategory="99"
+        android:title="@string/search_place"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+</menu>

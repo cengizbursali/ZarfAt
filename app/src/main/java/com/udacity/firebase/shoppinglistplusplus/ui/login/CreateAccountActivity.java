@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,8 @@ public class CreateAccountActivity extends BaseActivity {
     private ProgressDialog mAuthProgressDialog;
     private Firebase mFirebaseRef;
     private EditText mEditTextUsernameCreate, mEditTextEmailCreate;
-    private String mUserName, mUserEmail, mPassword;
+    private Switch mSwitchGender;
+    private String mUserName, mUserEmail, mPassword, mGender;
     private SecureRandom mRandom = new SecureRandom();
 
 
@@ -73,6 +75,7 @@ public class CreateAccountActivity extends BaseActivity {
     public void initializeScreen() {
         mEditTextUsernameCreate = (EditText) findViewById(R.id.edit_text_username_create);
         mEditTextEmailCreate = (EditText) findViewById(R.id.edit_text_email_create);
+        mSwitchGender = (Switch) findViewById(R.id.switch_gender);
         LinearLayout linearLayoutCreateAccountActivity = (LinearLayout) findViewById(R.id.linear_layout_create_account_activity);
         initializeBackground(linearLayoutCreateAccountActivity);
 
@@ -100,6 +103,8 @@ public class CreateAccountActivity extends BaseActivity {
         mUserName = mEditTextUsernameCreate.getText().toString();
         mUserEmail = mEditTextEmailCreate.getText().toString().toLowerCase();
         mPassword = new BigInteger(130, mRandom).toString(32);
+        mGender = mSwitchGender.isChecked() ? mSwitchGender.getTextOn().toString()
+                : mSwitchGender.getTextOff().toString();
 
         /**
          * Check that email and user name are okay
@@ -218,7 +223,7 @@ public class CreateAccountActivity extends BaseActivity {
         timestampJoined.put(Constants.FIREBASE_PROPERTY_TIMESTAMP, ServerValue.TIMESTAMP);
 
         /* Create a HashMap version of the user to add */
-        User newUser = new User(mUserName, encodedEmail, timestampJoined);
+        User newUser = new User(mUserName, encodedEmail, mGender, timestampJoined);
         HashMap<String, Object> newUserMap = (HashMap<String, Object>)
                 new ObjectMapper().convertValue(newUser, Map.class);
 
