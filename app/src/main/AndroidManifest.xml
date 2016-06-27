@@ -19,7 +19,7 @@
     <application
         android:name=".ShoppingListApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_shopping_list"
+        android:icon="@mipmap/icon_zarfat"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <meta-data
@@ -30,21 +30,13 @@
             android:value="AIzaSyBnRSkkRRZ2mlDGsoTo0PnhleCb9_KYmeA" />
 
         <activity
-            android:name=".ui.MainActivity"
-            android:label="@string/app_name"
+            android:name=".map.MapMainActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/NavTheme"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.udacity.firebase.shoppinglistplusplus.ui.MainActivity" />
-        </activity>
-        <activity
-            android:name=".ui.activeListDetails.ActiveListDetailsActivity"
-            android:label="@string/title_activity_list_details"
-            android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="adjustPan">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity" />
+                android:value=".map.MapMainActivity" />
         </activity>
         <activity android:name=".ui.login.LoginActivity">
             <intent-filter android:label="@string/app_name">
@@ -62,9 +54,6 @@
                 android:value=".ui.login.LoginActivity" />
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
-            android:label="@string/action_settings" />
-        <activity
             android:name=".ui.sharing.AddFriendActivity"
             android:label="@string/title_activity_add_friend"
             android:parentActivityName=".ui.sharing.FriendsList">
@@ -79,9 +68,6 @@
             android:name=".ui.sharing.FriendsList"
             android:label="@string/title_activity_friends_list"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".map.MapMainActivity"
-            android:launchMode="singleTop" />
 
         <receiver
             android:name=".geofence.GeofenceReceiver"
@@ -92,10 +78,6 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.UserProfileActivity" />
-        <activity android:name=".ui.ElifActivity" />
-        <activity android:name=".ui.NavigatorActivity" />
-
         <!-- <activity android:name=".ui.CengizMainActivity" /> -->
         <activity android:name="com.facebook.FacebookActivity" />
 
@@ -103,6 +85,10 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+        <activity
+            android:name=".map.WriteMessageActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".map.ShowMessageActivity" />
     </application>
 
 </manifest>

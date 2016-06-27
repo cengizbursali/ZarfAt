@@ -5,16 +5,17 @@
     </style>
 
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorBackground">@color/background_material_light</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/primary_dark</item>
-        <item name="android:colorBackground">@color/primary</item>
         <!--<item name="android:textColorPrimary">@android:color/white</item>-->
         <!--<item name="android:textColorSecondary">#fcfcfc</item>-->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
     </style>
 
     <style name="Toolbar" parent="Widget.AppCompat.Light.ActionBar">
@@ -24,3 +25,30 @@
 
 
 </resources>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<resources>-->
+
+    <!--<style name="AppTheme" parent="AppTheme.Base">-->
+    <!--</style>-->
+
+    <!--<style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">-->
+        <!--<item name="colorPrimary">@color/primary</item>-->
+        <!--<item name="colorPrimaryDark">@color/primary_dark</item>-->
+        <!--<item name="colorAccent">@color/primary_dark</item>-->
+        <!--<item name="android:colorBackground">@color/primary</item>-->
+        <!--&lt;!&ndash;<item name="android:textColorPrimary">@android:color/white</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:textColorSecondary">#fcfcfc</item>&ndash;&gt;-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
+    <!--</style>-->
+
+    <!--<style name="Toolbar" parent="Widget.AppCompat.Light.ActionBar">-->
+        <!--<item name="android:background">@color/primary</item>-->
+        <!--<item name="android:textColorPrimary">@android:color/white</item>-->
+    <!--</style>-->
+
+
+<!--</resources>-->

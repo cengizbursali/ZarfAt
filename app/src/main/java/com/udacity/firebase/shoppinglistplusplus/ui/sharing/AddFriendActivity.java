@@ -23,9 +23,6 @@ public class AddFriendActivity extends BaseActivity {
     private ListView mListViewAutocomplete;
     private Firebase mUsersRef;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -77,11 +77,6 @@
             android:text="@string/button_signin_with_password"
             android:textColor="@android:color/white" />
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/login_with_google"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
         <com.facebook.login.widget.LoginButton
             android:id="@+id/login_with_facebook"
             android:layout_width="match_parent"

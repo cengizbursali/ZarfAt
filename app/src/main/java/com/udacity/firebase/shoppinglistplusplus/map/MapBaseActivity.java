@@ -1,7 +1,9 @@
 package com.udacity.firebase.shoppinglistplusplus.map;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +14,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.facebook.login.LoginManager;
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -19,26 +24,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.GoogleMap;
 import com.udacity.firebase.shoppinglistplusplus.R;
+import com.udacity.firebase.shoppinglistplusplus.ui.login.LoginActivity;
 import com.udacity.firebase.shoppinglistplusplus.utils.Constants;
 
-/**
- * Created by rajaee on 3/12/16.
- */
 public class MapBaseActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MapMainActivity.class.getSimpleName();
 
     protected GoogleApiClient mGoogleApiClient;
-    boolean mapReady = false;
     protected GoogleMap m_map;
-
+    boolean mapReady = false;
     private int navigationItemId;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
+
+    private Firebase mFirebaseRef;
+    private String mProvider;
+    private Firebase.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +53,15 @@ public class MapBaseActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
         toolbar.setTitle("");
         toolbar.setSubtitle("");
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
@@ -66,6 +74,25 @@ public class MapBaseActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MapBaseActivity.this);
+        mProvider = sp.getString(Constants.KEY_PROVIDER, null);
+        mFirebaseRef = new Firebase(Constants.FIREBASE_URL);
+        mAuthListener = new Firebase.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(AuthData authData) {
+                     /* The user has been logged out */
+                if (authData == null) {
+                        /* Clear out shared preferences */
+                    SharedPreferences.Editor spe = sp.edit();
+                    spe.putString(Constants.KEY_ENCODED_EMAIL, null);
+                    spe.putString(Constants.KEY_PROVIDER, null);
+
+                    takeUserToLoginScreenOnUnAuth();
+                }
+            }
+        };
+        mFirebaseRef.addAuthStateListener(mAuthListener);
     }
 
     protected void createPlaceFinder() {
@@ -140,9 +167,10 @@ public class MapBaseActivity extends AppCompatActivity
 
         navigationItemId = item.getItemId();
         //Check to see which item was being clicked and perform appropriate action
-        switch (navigationItemId){
+        switch (navigationItemId) {
             case R.id.navigation_item_1:
                 drawerLayout.closeDrawer(GravityCompat.START);
+                logout();
                 return true;
             case R.id.navigation_item_2:
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -164,5 +192,25 @@ public class MapBaseActivity extends AppCompatActivity
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void takeUserToLoginScreenOnUnAuth() {
+        /* Move user to LoginActivity, and remove the backstack */
+        Intent intent = new Intent(MapBaseActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    protected void logout() {
+
+        /* Logout if mProvider is not null */
+        if (mProvider != null) {
+            mFirebaseRef.unauth();
+            if (mProvider.equals(Constants.FACEBOOK_PROVIDER)) {
+                /* Logout from Facebook */
+                LoginManager.getInstance().logOut();
+            }
+        }
     }
 }

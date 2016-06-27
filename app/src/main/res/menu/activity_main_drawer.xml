@@ -2,38 +2,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".map.MapMainActivity">
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
         <item
-            android:id="@+id/navigation_topheader"
-            android:title="Navigation">
-            <menu>
-                <item
-                    android:id="@+id/navigation_item_1"
-                    android:icon="@android:drawable/ic_menu_send"
-                    android:title="@string/navigation_item_1" />
-                <item
-                    android:id="@+id/navigation_item_2"
-                    android:icon="@android:drawable/ic_menu_send"
-                    android:title="@string/navigation_item_2" />
-                <item
-                    android:id="@+id/navigation_item_3"
-                    android:icon="@android:drawable/ic_menu_send"
-                    android:title="@string/navigation_item_3" />
-            </menu>
-        </item>
+            android:id="@+id/navigation_item_1"
+            android:icon="@android:drawable/ic_menu_send"
+            android:title="@string/nav_item_sent_messages" />
         <item
-            android:id="@+id/navigation_subheader"
-            android:title="@string/nav_sub_header">
-            <menu>
-                <item
-                    android:id="@+id/navigation_sub_item_1"
-                    android:icon="@android:drawable/ic_dialog_info"
-                    android:title="@string/nav_sub_item_1" />
-                <item
-                    android:id="@+id/navigation_sub_item_2"
-                    android:icon="@android:drawable/ic_dialog_info"
-                    android:title="@string/nav_sub_item_2" />
-            </menu>
-        </item>
+            android:id="@+id/navigation_item_2"
+            android:icon="@android:drawable/ic_dialog_email"
+            android:title="@string/nav_item_received_messages" />
+        <item
+            android:id="@+id/navigation_item_3"
+            android:icon="@drawable/nav_menu_friends"
+            android:title="@string/nav_item_friends" />
+    </group>
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+        <!--<item-->
+        <!--android:id="@+id/navigation_subheader"-->
+        <!--android:title="@string/nav_sub_header">-->
+        <!--<menu>-->
+        <item
+            android:id="@+id/navigation_sub_item_1"
+            android:icon="@drawable/nav_menu_settings"
+            android:title="@string/nav_sub_item_settings" />
+        <item
+            android:id="@+id/navigation_sub_item_2"
+            android:icon="@drawable/nav_menu_logout"
+            android:title="@string/nav_sub_item_logout" />
+        <!--</menu>-->
+        <!--</item>-->
     </group>
 </menu>
