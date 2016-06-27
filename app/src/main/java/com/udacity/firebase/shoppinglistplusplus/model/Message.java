@@ -1,37 +1,50 @@
 package com.udacity.firebase.shoppinglistplusplus.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-/**
- * Created by rajaee on 2/27/16.
- */
-public class Message {
+public class Message implements Serializable {
     private String context;
-    private String creator;
-    private HashMap<String, Object> location;
+    private String creatorEmail;
+    private String creatorName;
+    private Location location;
     private HashMap<String, Object> timestampCreated;
+    private HashMap<String, Object> timestampRead;
 
     public Message() {
     }
 
-    public Message(String context, HashMap<String, Object> location,
-                   HashMap<String, Object> timestampCreated, String creator) {
+    public Message(String context, Location location, HashMap<String, Object> timestampCreated,
+                   String creatorEmail, String creatorName) {
         this.context = context;
         this.location = location;
         this.timestampCreated = timestampCreated;
-        this.creator = creator;
+        this.creatorEmail = creatorEmail;
+        this.creatorName = creatorName;
 
+    }
+
+    public void setTimestampRead(HashMap<String, Object> timestampRead) {
+        this.timestampRead = timestampRead;
+    }
+
+    public HashMap<String, Object> getTimestampRead() {
+        return timestampRead;
+    }
+
+    public String getCreatorName() {
+        return creatorName;
     }
 
     public HashMap<String, Object> getTimestampCreated() {
         return timestampCreated;
     }
 
-    public String getCreator() {
-        return creator;
+    public String getCreatorEmail() {
+        return creatorEmail;
     }
 
-    public HashMap<String, Object> getLocation() {
+    public Location getLocation() {
         return location;
     }
 

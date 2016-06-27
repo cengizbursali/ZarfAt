@@ -17,18 +17,18 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.udacity.firebase.shoppinglistplusplus.R;
 import com.udacity.firebase.shoppinglistplusplus.map.MapMainActivity;
+import com.udacity.firebase.shoppinglistplusplus.map.WriteMessageActivity;
 import com.udacity.firebase.shoppinglistplusplus.utils.Constants;
+import com.udacity.firebase.shoppinglistplusplus.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by rajaee on 3/5/16.
- */
 public class GeofenceReceiver extends BroadcastReceiver {
     protected static final String TAG = GeofenceReceiver.class.getSimpleName();
     private String receiverEncodedEmail;
     private String messageId;
+    private String senderEncodedEmail;
     private Context mContext;
 
     private Context getContext() {
@@ -38,12 +38,13 @@ public class GeofenceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
-        receiverEncodedEmail = intent.getStringExtra(Constants.KEY_ENCODED_EMAIL);
+        receiverEncodedEmail = intent.getStringExtra(Constants.KEY_RECEIVER_ENCODED_EMAIL);
+        senderEncodedEmail = intent.getStringExtra(Constants.KEY_SENDER_ENCODED_EMAIL);
         messageId = intent.getStringExtra(Constants.KEY_MESSAGE_ID);
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
-            String errorMessage = GeofenceErrorMessages.getErrorString(getContext(),
+            String errorMessage = Utils.getErrorString(getContext(),
                     geofencingEvent.getErrorCode());
             Log.e(TAG, errorMessage);
             return;
@@ -55,7 +56,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
         String userEncodedMail = PreferenceManager.getDefaultSharedPreferences(getContext())
                 .getString(Constants.KEY_ENCODED_EMAIL, null);
         // Test that the reported transition was of interest.
-        if (userEncodedMail.equals(receiverEncodedEmail) && geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+        if (userEncodedMail != null && userEncodedMail.equals(receiverEncodedEmail) && geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
@@ -90,7 +91,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
-        return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
+        return geofenceTransitionString /*+ ": " + triggeringGeofencesIdsString*/;
     }
 
     private String getTransitionString(int transitionType) {
@@ -108,11 +109,12 @@ public class GeofenceReceiver extends BroadcastReceiver {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getContext(), MapMainActivity.class);
         notificationIntent.putExtra(Constants.KEY_MESSAGE_ID, messageId);
+        notificationIntent.putExtra(Constants.KEY_SENDER_ENCODED_EMAIL, senderEncodedEmail);
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
 
         // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MapMainActivity.class);
+        stackBuilder.addParentStack(WriteMessageActivity.class);
 
         // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);
@@ -126,11 +128,11 @@ public class GeofenceReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
 
         // Define the notification settings.
-        builder.setSmallIcon(R.mipmap.ic_shopping_list)
+        builder.setSmallIcon(R.mipmap.icon_zarfat)
                 // In a real app, you may want to use a library like Volley
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getContext().getResources(),
-                        R.mipmap.ic_shopping_list))
+                        R.mipmap.icon_zarfat))
                 .setColor(Color.RED)
                 .setContentTitle(notificationDetails)
                 .setContentText(getContext().getString(R.string.geofence_transition_notification_text))

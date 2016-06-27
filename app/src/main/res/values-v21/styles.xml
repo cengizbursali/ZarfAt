@@ -1,4 +1,8 @@
 <resources>
+    <style name="NavTheme" parent="AppTheme.Base">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 
     <style name="FAB">
         <item name="android:layout_margin">16dp</item>

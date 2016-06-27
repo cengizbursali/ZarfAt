@@ -9,7 +9,7 @@
         android:id="@+id/profile_image"
         android:layout_width="76dp"
         android:layout_height="76dp"
-        android:src="@drawable/avatar_female"
+        android:src="@drawable/avatar_male"
         android:layout_marginLeft="24dp"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
@@ -33,7 +33,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="eminuluyol@gmail.com"
+        android:text="recai.huseyin.93@gmail.com"
         android:id="@+id/email"
         android:gravity="left"
         android:layout_marginBottom="8dp"
