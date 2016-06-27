@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ShoppingList++
 ========
 
@@ -18,3 +19,6 @@ As mistakes in the original repository are fixed, the code will be <a href="http
 - **1/26/2016** : [Changelog](https://docs.google.com/document/d/1SgBmUu7COQQT5maqKVvIV4Iv0Oyva9-9-YRnpQ88XuY/pub)
 - **12/10/2015** : [Changelog](https://docs.google.com/document/d/1A5BSoLyEHkXrcBC50lNXqrl1Rkh0G2nM-h4ER8lKovw/pub)
 - **11/30/2015** : Lesson 1 and 2 launch
+=======
+# ZarfAt
+>>>>>>> origin/master
