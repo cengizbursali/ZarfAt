@@ -27,7 +27,6 @@ public final class Constants {
     public static final String FIREBASE_LOCATION_RECEIVED_MESSAGES = "receivedMessages";
 
 
-
     /**
      * Constants for Firebase object properties
      */
@@ -45,7 +44,7 @@ public final class Constants {
     /**
      * Constants for Firebase URL
      */
-    public static final String FIREBASE_URL = BuildConfig.UNIQUE_FIREBASE_ROOT_URL;
+    public static final String FIREBASE_URL = "https://sizzling-heat-3535.firebaseio.com/";
     public static final String FIREBASE_URL_SHOPPING_LIST_ITEMS = FIREBASE_URL + "/" + FIREBASE_LOCATION_SHOPPING_LIST_ITEMS;
     public static final String FIREBASE_URL_USERS = FIREBASE_URL + "/" + FIREBASE_LOCATION_USERS;
     public static final String FIREBASE_URL_USER_LISTS = FIREBASE_URL + "/" + FIREBASE_LOCATION_USER_LISTS;
@@ -86,7 +85,6 @@ public final class Constants {
     public static final String GOOGLE_PROVIDER = "google";
     public static final String FACEBOOK_PROVIDER = "facebook";
     public static final String PROVIDER_DATA_DISPLAY_NAME = "displayName";
-
 
 
     public static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
